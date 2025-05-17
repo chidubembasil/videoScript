@@ -1,0 +1,131 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VideoScript</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+      padding: 2rem;
+      display: flex;
+      justify-content: center;
+    }
+    .container {
+      background: white;
+      padding: 2rem;
+      border-radius: 16px;
+      max-width: 800px;
+      width: 100%;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      text-align: center;
+      color: #1f2937;
+      margin-bottom: 1rem;
+    }
+    label {
+      font-weight: 600;
+      margin-top: 1rem;
+      display: block;
+    }
+    input, textarea, select {
+      width: 100%;
+      padding: 0.75rem;
+      margin-top: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      font-size: 1rem;
+      resize: vertical;
+    }
+    button {
+      background-color: #4f46e5;
+      color: white;
+      padding: 0.9rem 1.5rem;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      margin-top: 1.5rem;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background-color: #4338ca;
+    }
+    .output {
+      margin-top: 2rem;
+      background: #f9fafb;
+      padding: 1.5rem;
+      border-radius: 12px;
+      border: 1px solid #e5e7eb;
+      white-space: pre-wrap;
+      font-family: monospace;
+      color: #111827;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Video Script </h1>
+    <label for="product">Product/Service Name:</label>
+<input id="product" type="text" placeholder="e.g., Fabriq AR Fashion Kit" />
+
+<label for="audience">Target Audience:</label>
+<input id="audience" type="text" placeholder="e.g., Fashion Designers, Retailers" />
+
+<label for="points">Unique Selling Points (comma-separated):</label>
+<textarea id="points" rows="3" placeholder="e.g., AR integration, easy to use, eco-friendly"></textarea>
+
+<label for="tone">Tone:</label>
+<select id="tone">
+  <option value="persuasive">Persuasive</option>
+  <option value="casual">Casual</option>
+  <option value="corporate">Corporate</option>
+  <option value="inspiring">Inspiring</option>
+</select>
+
+<label for="duration">Desired Script Length (e.g., 60 seconds):</label>
+<input id="duration" type="text" placeholder="e.g., 60 seconds" />
+
+<button onclick="generateScript()">Generate</button>
+
+<div class="output" id="output">The generated script and slide ideas will appear here...</div>
+
+  </div>  <script>
+    async function generateScript() {
+      const product = document.getElementById('product').value.trim();
+      const audience = document.getElementById('audience').value.trim();
+      const points = document.getElementById('points').value.trim();
+      const tone = document.getElementById('tone').value;
+      const duration = document.getElementById('duration').value.trim();
+
+      if (!product || !audience || !points) {
+        alert("Please fill in all required fields.");
+        return;
+      }
+
+      const prompt = `Create a ${tone} video sales script for a product called "${product}" targeting "${audience}". Highlight the following unique selling points: ${points}. The script should be suitable for a video of approximately ${duration || '60 seconds'}. Also provide slide titles for a presentation version.`;
+
+      document.getElementById("output").textContent = "Generating... Please wait.";
+
+      const response = await fetch("http://localhost:11434/api/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          model: "qwen:latest",
+          prompt: prompt,
+          stream: false
+        })
+      });
+
+      const data = await response.json();
+      document.getElementById("output").textContent = data.response.trim();
+    }
+  </script></body>
+</html>
